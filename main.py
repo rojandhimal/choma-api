@@ -2,9 +2,27 @@ import logging
 import sys
 from flask import Flask, request, send_file
 from pytube import YouTube
+import numpy as np
  
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 app = Flask(__name__)
+
+
+def generateUrl(id):
+    return "https://www.youtube.com/watch?v="+id
+
+# function to get unique values
+def getUnique(list1):
+ 
+    # initialize a null list
+    unique_list = []
+     
+    # traverse for all elements
+    for x in list1:
+        # check if exists in unique_list or not
+        if x not in unique_list:
+            unique_list.append(x)
+    return unique_list
  
 @app.route('/')
 def youtube_downloader():
@@ -20,34 +38,41 @@ def youtube_downloader():
                     </body></html>"""
     return html_page
  
-@app.route('/get-quality/<url>', methods=['GET','POST'])
-def download_video(url):
+@app.route('/get-quality/<video_id>', methods=['GET','POST'])
+def get_video_quality(video_id):
     """
+    input : youtube video id
+    output : all available quality list
     get all video quality
     """
     try:
-        youtube_url = request.form['URL']
+        youtube_url = generateUrl(id=video_id)
         video_resolutions = []
         videos = []
         my_video = YouTube(youtube_url)
-        for stream in my_video.streams.order_by('resolution'):
-            # print(stream)
+        for stream in my_video.streams.filter(only_video=True).order_by('resolution'):
             video_resolutions.append(stream.resolution)
             videos.append(stream)
-        # print("video_resolutions",video_resolutions)
-    #     fname = download_path.split('//')[-1]
-    #     return send_file(fname, as_attachment=True)
-        return video_resolutions,youtube_url
+        return {"quality":getUnique(video_resolutions)}
+    except:
+        logging.exception('Failed download')
+        return {"fail":'Video Quality download failed!'}
+
+@app.route('/download_video/<video_id>/<quality>', methods=['GET','POST'])
+def download_video(video_id,quality):
+    """
+    Download video
+    """
+    try:
+        youtube_url = generateUrl()
+        my_video = YouTube(youtube_url)
+        fname = download_path.split('//')[-1]
+        return send_file(fname, as_attachment=True)
     except:
         logging.exception('Failed download')
         return 'Video download failed!'
 
-@app.route("/download/<id>")
-def galleryrecommend(id):
-    print("name",id)
-    data=get_recommendation(id)
-    return {"data":data}
-
 
 if __name__ == "__main__":
-  app.run()
+    app.run()
+    get_video_quality("https://www.youtube.com/watch?v=Yb3U2f6K2dI")
