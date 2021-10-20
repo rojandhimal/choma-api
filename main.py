@@ -64,10 +64,16 @@ def download_video(video_id,quality):
     Download video
     """
     try:
-        youtube_url = generateUrl()
+        youtube_url = generateUrl(video_id)
+        print("youtube_url",youtube_url)
         my_video = YouTube(youtube_url)
-        fname = download_path.split('//')[-1]
-        return send_file(fname, as_attachment=True)
+        stream = my_video.streams.get_by_resolution(str(quality))
+        download_path = "./videos/"
+        print("download_path",download_path)
+        stream.download(download_path)
+        fname = my_video.title
+        # return send_file(fname, as_attachment=True)
+        return {"success":fname}
     except:
         logging.exception('Failed download')
         return 'Video download failed!'
