@@ -3,6 +3,7 @@ import sys
 from flask import Flask, request, send_file
 from pytube import YouTube
 import numpy as np
+import os
  
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 app = Flask(__name__)
@@ -23,6 +24,18 @@ def getUnique(list1):
         if x not in unique_list:
             unique_list.append(x)
     return unique_list
+
+
+def send_download_file(file_path):
+    return send_file(file_path, as_attachment=True)
+
+def remove_download_file(file_path):
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        pass
+    else:
+        print("Can not delete the file as it doesn't exists")
+        pass
  
 @app.route('/')
 def youtube_downloader():
@@ -68,12 +81,14 @@ def download_video(video_id,quality):
         print("youtube_url",youtube_url)
         my_video = YouTube(youtube_url)
         stream = my_video.streams.get_by_resolution(str(quality))
-        download_path = "./videos/"
+        download_path = "videos"
         print("download_path",download_path)
         stream.download(download_path)
         fname = my_video.title
-        # return send_file(fname, as_attachment=True)
-        return {"success":fname}
+        video_path = os.getcwd() +'/videos'
+        files = os.listdir(video_path)
+        file_path = os.path.join(download_path, files[0]) 
+        return send_file(file_path, as_attachment=True)
     except:
         logging.exception('Failed download')
         return 'Video download failed!'
