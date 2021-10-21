@@ -1,7 +1,7 @@
 # Video downloader 
 ## Description
 
-Choma is Software as a Service(SaaS) product developed with the motive to download playlist vides. 
+Choma is Software as a Service(SaaS) product developed with the motive to download playlist videos. 
 
 ## Getting Started
 ### Dependencies
