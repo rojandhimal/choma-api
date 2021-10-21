@@ -66,7 +66,7 @@ def get_video_quality(video_id):
         for stream in my_video.streams.filter(only_video=True).order_by('resolution'):
             video_resolutions.append(stream.resolution)
             videos.append(stream)
-        return {"quality":getUnique(video_resolutions)}
+        return {"quality":getUnique(video_resolutions),"title":my_video.title,"thumbnail":my_video.thumbnail_url,"description":my_video.description,"views":my_video.views,"length":my_video.length/60}
     except:
         logging.exception('Failed download')
         return {"fail":'Video Quality download failed!'}
